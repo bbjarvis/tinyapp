@@ -31,3 +31,7 @@ app.get("/urls", (req, res) => {
   const templateVars = {urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
+
+app.get("/urls:shortURL", (res, req) => {
+  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.longURL]}
+})
