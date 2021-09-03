@@ -43,10 +43,16 @@ app.post("/urls", (req,res) => {
   res.redirect(`/urls/${shortURL}`)
 });
 
-//  GET route to render urls_new.ejs template to present fomr to user
+//  GET route to render urls_new.ejs template to present form to user
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
+
+//  POST route to remove a URL resource if 'delete' button is pushed
+app.post('/urls/:shortURL/delete', (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls");
+})
 
 //  redirect to longURL when clicking on shortURL link
 app.get("/u/:shortURL", (req, res) => {
