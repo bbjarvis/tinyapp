@@ -15,7 +15,7 @@ app.use(cookieParser());
 //  object urlDatabase for the initial URLs
 const urlDatabase = {
   "b2xVn2": {longURL: "http://www.lighthouselabs.ca", username: "Brett"},
-  "9sm5xK": {longURL: "http://www.google.com", username: "Brett"}
+  "9sm5xK": {longURL: "http://www.google.com", username: "Noah"}
 };
 //  basic homepage to check that things are working correctly
 app.get("/", (req, res) => {
@@ -42,9 +42,16 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+//  login button on header
 app.post("/login", (req, res) => {
   res.cookie('username', req.body.username);
   res.redirect("urls");
+})
+
+//  logout button on header
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/urls");
 })
 
 app.post("urls", (req, res) => {
