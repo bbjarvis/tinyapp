@@ -8,11 +8,14 @@ app.set("view engine", "ejs");
 //  body-parser library to convert request body from buffer to string
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+const cookieParser = require('cookie-parser');
+const { compile } = require('ejs');
+app.use(cookieParser());
 
 //  object urlDatabase for the initial URLs
 const urlDatabase = {
-  "b2xVn2": {longURL: "http://www.lighthouselabs.ca"},
-  "9sm5xK": {longURL: "http://www.google.com"}
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", username: "Brett"},
+  "9sm5xK": {longURL: "http://www.google.com", username: "Brett"}
 };
 //  basic homepage to check that things are working correctly
 app.get("/", (req, res) => {
@@ -31,9 +34,28 @@ app.get("/hello", (req, res) => {
 
 //  urls main page showing urlDatabase contents
 app.get("/urls", (req, res) => {
-  const templateVars = {urls: urlDatabase};
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase    
+  };
+
   res.render("urls_index", templateVars);
 });
+
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("urls");
+})
+
+app.post("urls", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase,
+  };
+  res.render("urls_index", templateVars);
+  const redirect = urlDatabase[req.params.shortURL];
+  res.redirect(redirect.longURL);
+})
 
 //  handle longURL edits without changing the shortURL
 app.post("/urls/:shortURL", (req, res) => {
@@ -53,8 +75,13 @@ app.post("/urls", (req,res) => {
 
 //  GET route to render urls_new.ejs template to present form to user
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase,
+  }
+  res.render("urls_new", templateVars);
 });
+
 
 //  POST route to remove a URL resource if 'delete' button is pushed
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -72,7 +99,9 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL
+    longURL: urlDatabase[req.params.shortURL].longURL,
+    username: req.cookies["username"],
+    urls: urlDatabase,
   }
   res.render("urls_show", templateVars);
 });

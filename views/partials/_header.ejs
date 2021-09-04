@@ -9,6 +9,11 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
+      <h4><%= username %></h4>
+      <form method="POST" action="/login">
+      <input name="username">
+      <button type="submit" class="btn btn-outline-primary">Login</button>
+    </form>
     </div>
   </nav>
 </header>
