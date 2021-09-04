@@ -35,6 +35,14 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+//  handle longURL edits without changing the shortURL
+app.post("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  const newLongURL = req.body.longURL;
+  urlDatabase[shortURL] = { longURL: newLongURL };
+  res.redirect(`/urls`)
+})
+
 //  define route to handle POST request, create new shot-longURL key-value in urlDatabase
 app.post("/urls", (req,res) => {
   const shortURL = generateRandomString();
