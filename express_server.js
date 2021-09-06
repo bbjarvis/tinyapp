@@ -60,10 +60,10 @@ app.get("/register", (req, res) => {
 //  endpoint that handles the registration form data
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
-    return res.status(400).send('Something went wrong,\n invalid email or password')
+    return res.status(400).send('Something went wrong,Email or Password cannot be blank (CODE 400, BAD REQUEST)')
   };
   if (checkRegistry(req.body)) {
-    return res.status(400).send('Something went wrong,\n email already exists')
+    return res.status(400).send('Something went wrong, email already exists (CODE 400, BAD REQUEST)')
   }
   
   const randoID = generateRandomString();
@@ -90,23 +90,20 @@ app.get("/login", (req, res) => {
 //  login button on header
 app.post("/login", (req, res) => {
   if (!req.body.email || !req.body.password) {
-    return res.status(400).send('Something went wrong,\n invalid email or password')
+    return res.status(403).send('Email or Password cannot be blank (CODE 403, FORBIDDEN)')
   };
   if (!checkRegistry(req.body)) {
-    return res.status(400).send('Something went wrong,\n email already exists')
+    return res.status(403).send('User does not exist (CODE 403, BAD FORBIDDEN)')
+  };
+  if (users[checkRegistry(req.body)].password !== req.body.password) {
+    return res.status(403).send('Incorrect Password (CODE 403, BAD FORBIDDEN)')
   }
   
-  const randoID = generateRandomString();
-  const email = req.body.email;
-  const password = req.body.password;
-  users[randoID] = {
-    id: randoID,
-    email: email,
-    password: password,
-  }
-  // console.log('register page',users);
+  const randoID = checkRegistry(req.body);
+
   res.cookie("user_id", randoID)
   res.redirect("/urls");
+  // console.log(users[randoID])
 })
 
 //  urls main page showing urlDatabase contents
