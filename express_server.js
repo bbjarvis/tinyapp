@@ -82,7 +82,6 @@ app.post("/register", (req, res) => {
   }
   
   const randoID = generateRandomString();
-  // console.log('randoID',randoID)
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10)
@@ -91,7 +90,6 @@ app.post("/register", (req, res) => {
     email: email,
     password: hashedPassword,
   }
-  // console.log('register page',users);
   req.session.user_id = randoID;
   res.redirect("/urls");
 });
@@ -120,15 +118,12 @@ app.post("/login", (req, res) => {
 
   req.session.user_id = randoID;
   res.redirect("/urls");
-  // console.log(users[randoID])
 })
 
 //  urls main page showing urlDatabase contents
 app.get("/urls", (req, res) => {
   //  check current user, define currentDatabase so only current user urls show
-  // console.log('cookies', req.cookies["user_id"])  
   const currentDatabase = (urlsForUser(req.session["user_id"]));
-    // console.log('get urls', currentDatabase)
     const templateVars = {
       user: users[req.session["user_id"]],
       urls: currentDatabase
@@ -138,10 +133,8 @@ app.get("/urls", (req, res) => {
 
 //  logout button on header
 app.post("/logout", (req, res) => {
-  // console.log('before clear', users)
 
   req.session = null;
-  // console.log('after clear', users)
   res.redirect("/urls");
 })
 
@@ -167,11 +160,8 @@ app.post("/urls/:shortURL", (req, res) => {
 //  define route to handle POST request, create new shot-longURL key-value in urlDatabase
 app.post("/urls", (req,res) => {
   const shortURL = generateRandomString();
-  // console.log("user_id")
-  // console.log('new url cookie', req.cookies['user_id'])
 
   urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session["user_id"]};
-  console.log(urlDatabase)
   res.redirect(`/urls/${shortURL}`)
 });
 
@@ -204,8 +194,6 @@ app.get("/urls/:shortURL", (req, res) => {
     user: users[req.session["user_id"]],
     urls: urlDatabase,
   }
-  // console.log(templateVars)
-  // console.log('new url cookie', req.cookies['user_id'])
 
   res.render("urls_show", templateVars);
 });
@@ -228,7 +216,6 @@ function generateRandomString() {
 //  check if the user already exists in registry; input is email, output is false or user
 const checkRegistry = (body) => {
   for (const user in users) {
-    // console.log(users[user].email);
     if (users[user].email === body.email) {
       return users[user].id;
     }
@@ -238,13 +225,8 @@ const checkRegistry = (body) => {
 
 const urlsForUser = (id) => {
   const currentDatabase = {};
-  // console.log('urlsForUser', id)
-  // console.log(urlDatabase)
   for (const urls in urlDatabase) {
-    // console.log(urls)
-    // console.log(urlDatabase[urls])
     if (urlDatabase[urls].userID === id) {
-      // console.log(urlDatabase[urls].longURL)
       currentDatabase[urls] = {'longURL': urlDatabase[urls].longURL, 'userID': urlDatabase[urls].userID} 
     }
   }
