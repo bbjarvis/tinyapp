@@ -8,7 +8,7 @@ app.set("view engine", "ejs");
 //  body-parser library to convert request body from buffer to string
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
-//  cookieParser library
+
 const { compile } = require('ejs');
 
 //  bcryct to hash passwords
@@ -117,7 +117,6 @@ app.post("/login", (req, res) => {
   }
   
   const randoID = getUserByEmail(req.body.email, users);
-  // console.log(randoID, getUserByEmail(req.body.email, users))
 
   req.session.user_id = randoID;
   res.redirect("/urls");
