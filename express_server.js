@@ -9,9 +9,7 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 //  cookieParser library
-const cookieParser = require('cookie-parser');
 const { compile } = require('ejs');
-app.use(cookieParser());
 
 //  bcryct to hash passwords
 const bcrypt = require('bcrypt');
@@ -25,6 +23,10 @@ app.use(cookieSession({
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
+
+//  require helper functions:
+const getUserByEmail = require('./helpers');
+
 
 //  object urlDatabase for the initial URLs
 const urlDatabase = {
@@ -110,11 +112,12 @@ app.post("/login", (req, res) => {
   if (!checkRegistry(req.body)) {
     return res.status(403).send('User does not exist (CODE 403, BAD FORBIDDEN)')
   };
-  if (!bcrypt.compareSync(req.body.password, users[checkRegistry(req.body)].password)) {
+  if (!bcrypt.compareSync(req.body.password, users[getUserByEmail(req.body.email, users)].password)) {
     return res.status(403).send('Incorrect Password (CODE 403, BAD FORBIDDEN)')
   }
   
-  const randoID = checkRegistry(req.body);
+  const randoID = getUserByEmail(req.body.email, users);
+  // console.log(randoID, getUserByEmail(req.body.email, users))
 
   req.session.user_id = randoID;
   res.redirect("/urls");
@@ -213,11 +216,11 @@ function generateRandomString() {
   return randoString;
 }
 
-//  check if the user already exists in registry; input is email, output is false or user
+//  check if the user already exists in registry; input is email, output is true or false
 const checkRegistry = (body) => {
   for (const user in users) {
     if (users[user].email === body.email) {
-      return users[user].id;
+      return true;
     }
   }
   return false;
