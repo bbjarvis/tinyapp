@@ -14,8 +14,9 @@ app.use(cookieParser());
 
 //  object urlDatabase for the initial URLs
 const urlDatabase = {
-  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userId: "userRandomID"},
-  "9sm5xK": {longURL: "http://www.google.com", userId: "user2RandomID"}
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userID: "userRandomID"},
+  "b3xVn3": {longURL: "http://www.ashl.com", userID: "userRandomID"},
+  "9sm5xK": {longURL: "http://www.google.com", userID: "user2RandomID"}
 };
 
 const users = { 
@@ -67,6 +68,7 @@ app.post("/register", (req, res) => {
   }
   
   const randoID = generateRandomString();
+  // console.log('randoID',randoID)
   const email = req.body.email;
   const password = req.body.password;
   users[randoID] = {
@@ -82,7 +84,7 @@ app.post("/register", (req, res) => {
 //  login page
 app.get("/login", (req, res) => {
   const templateVars = {
-    user: req.cookies["userId"],
+    user: req.cookies["userID"],
   };
   res.render("urls_login", templateVars);
 });
@@ -108,13 +110,16 @@ app.post("/login", (req, res) => {
 
 //  urls main page showing urlDatabase contents
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]],
-    urls: urlDatabase
-  };
-  // console.log('after redirect', users)
-  res.render("urls_index", templateVars);
-});
+  //  check current user, define currentDatabase so only current user urls show
+  // console.log('cookies', req.cookies["user_id"])  
+  const currentDatabase = (urlsForUser(req.cookies["user_id"]));
+    // console.log('get urls', currentDatabase)
+    const templateVars = {
+      user: users[req.cookies["user_id"]],
+      urls: currentDatabase
+    }
+    res.render("urls_index", templateVars);
+  });
 
 //  logout button on header
 app.post("/logout", (req, res) => {
@@ -139,15 +144,19 @@ app.post("urls", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const newLongURL = req.body.longURL;
-  urlDatabase[shortURL] = { longURL: newLongURL };
+
+  urlDatabase[shortURL] = { longURL: newLongURL};
   res.redirect(`/urls`)
 })
 
 //  define route to handle POST request, create new shot-longURL key-value in urlDatabase
 app.post("/urls", (req,res) => {
   const shortURL = generateRandomString();
+  // console.log("user_id")
+  // console.log('new url cookie', req.cookies['user_id'])
 
-  urlDatabase[shortURL] = { longURL: req.body.longURL};
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies["user_id"]};
+  console.log(urlDatabase)
   res.redirect(`/urls/${shortURL}`)
 });
 
@@ -180,6 +189,9 @@ app.get("/urls/:shortURL", (req, res) => {
     user: users[req.cookies["user_id"]],
     urls: urlDatabase,
   }
+  // console.log(templateVars)
+  // console.log('new url cookie', req.cookies['user_id'])
+
   res.render("urls_show", templateVars);
 });
 
@@ -207,5 +219,19 @@ const checkRegistry = (body) => {
     }
   }
   return false;
+}
 
+const urlsForUser = (id) => {
+  const currentDatabase = {};
+  // console.log('urlsForUser', id)
+  // console.log(urlDatabase)
+  for (const urls in urlDatabase) {
+    // console.log(urls)
+    // console.log(urlDatabase[urls])
+    if (urlDatabase[urls].userID === id) {
+      // console.log(urlDatabase[urls].longURL)
+      currentDatabase[urls] = {'longURL': urlDatabase[urls].longURL, 'userID': urlDatabase[urls].userID} 
+    }
+  }
+  return currentDatabase;
 }
