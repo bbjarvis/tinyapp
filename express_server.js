@@ -8,9 +8,23 @@ app.set("view engine", "ejs");
 //  body-parser library to convert request body from buffer to string
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+//  cookieParser library
 const cookieParser = require('cookie-parser');
 const { compile } = require('ejs');
 app.use(cookieParser());
+
+//  bcryct to hash passwords
+const bcrypt = require('bcrypt');
+
+//  cookie sessions require
+const cookieSession = require('cookie-session')
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 //  object urlDatabase for the initial URLs
 const urlDatabase = {
@@ -23,12 +37,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
  "user2RandomID": {
     id: "user2RandomID", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
   }
 }
 
@@ -71,10 +85,11 @@ app.post("/register", (req, res) => {
   // console.log('randoID',randoID)
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10)
   users[randoID] = {
     id: randoID,
     email: email,
-    password: password,
+    password: hashedPassword,
   }
   // console.log('register page',users);
   res.cookie("user_id", randoID)
@@ -97,7 +112,7 @@ app.post("/login", (req, res) => {
   if (!checkRegistry(req.body)) {
     return res.status(403).send('User does not exist (CODE 403, BAD FORBIDDEN)')
   };
-  if (users[checkRegistry(req.body)].password !== req.body.password) {
+  if (!bcrypt.compareSync(req.body.password, users[checkRegistry(req.body)].password)) {
     return res.status(403).send('Incorrect Password (CODE 403, BAD FORBIDDEN)')
   }
   
@@ -145,7 +160,7 @@ app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const newLongURL = req.body.longURL;
 
-  urlDatabase[shortURL] = { longURL: newLongURL};
+  urlDatabase[shortURL] = { longURL: newLongURL, userID: req.cookies["user_id"]};
   res.redirect(`/urls`)
 })
 
