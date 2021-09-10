@@ -50,7 +50,7 @@ const users = {
 
 //  basic homepage to check that things are working correctly
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
 
 //  page to show JSON string of entire urlDatabase object
@@ -196,6 +196,10 @@ app.get("/urls/:shortURL", (req, res) => {
     user: users[req.session["user_id"]],
     urls: urlDatabase,
   };
+  if (!req.session.user_id) {
+    res.redirect(urlDatabase[req.params.shortURL].longURL);
+    // res.redirect(`/urls`);
+  }
 
   res.render("urls_show", templateVars);
 });
@@ -206,14 +210,14 @@ app.listen(PORT, () => {
 });
 
 //  generate random string of 6 alphanumeric characters
-const generateRandomString = () => {
+function generateRandomString() {
   let randoString = '';
   const alphabet = 'qwertyuiopasdfghjklzxcvbnm1234567890';
   for (let i = 0; i < 6; i++) {
     randoString += alphabet[Math.floor(Math.random() * alphabet.length)];
   }
   return randoString;
-};
+}
 
 //  check if the user already exists in registry; input is email, output is true or false
 const checkRegistry = (body) => {
