@@ -198,7 +198,6 @@ app.get("/urls/:shortURL", (req, res) => {
   };
   if (!req.session.user_id) {
     res.redirect(urlDatabase[req.params.shortURL].longURL);
-    // res.redirect(`/urls`);
   }
 
   res.render("urls_show", templateVars);
