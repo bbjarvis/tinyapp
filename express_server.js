@@ -190,17 +190,18 @@ app.get("/u/:shortURL", (req, res) => {
 
 //  GET route to render shortURL and it's corresponding longURL from urlDatabase
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.session["user_id"]],
-    urls: urlDatabase,
-  };
   if (!req.session.user_id) {
     res.redirect(urlDatabase[req.params.shortURL].longURL);
-  }
+  } else{
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      user: users[req.session["user_id"]],
+      urls: urlDatabase,
+    };
 
-  res.render("urls_show", templateVars);
+    res.render("urls_show", templateVars);
+  }
 });
 
 //  message to display in terminal to show that app is on
