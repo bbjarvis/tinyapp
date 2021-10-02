@@ -100,6 +100,7 @@ app.post("/register", (req, res) => {
 app.get("/login", (req, res) => {
   const templateVars = {
     user: req.session["userID"],
+    error: null,
   };
   res.render("urls_login", templateVars);
 });
@@ -107,7 +108,8 @@ app.get("/login", (req, res) => {
 //  login button on header
 app.post("/login", (req, res) => {
   if (!req.body.email || !req.body.password) {
-    return res.status(403).send('Email or Password cannot be blank (CODE 403, FORBIDDEN)');
+    let templateVars = {user: null, error:'Email or Password cannot be blank (CODE 403, FORBIDDEN)'};
+    return res.status(403).render("urls_login", templateVars);
   }
   if (!checkRegistry(req.body)) {
     return res.status(403).send('User does not exist (CODE 403, BAD FORBIDDEN)');
