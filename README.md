@@ -4,13 +4,13 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 Once logged in, the user can create short URLs using the "Create Short URL" link on the header:
-!["TinyApp Creat TinyURL"](https://github.com/bbjarvis/tinyapp/blob/master/docs/TinyApp%20Create%20TInyURL.png)
+!["TinyApp Creat TinyURL"](/docs/TinyAppCreateTInyURL.png)
 
 With some short URLs created, the home page will be populated:
-!["TinyApp URLs Home Page"](https://github.com/bbjarvis/tinyapp/blob/master/docs/TinyApp%20URLs%20Home%20Page.png)
+!["TinyApp URLs Home Page"](/docs/TinyAppURLsHomePage.png)
 
 By clicking the "Edit" button can update any of the long URLs while keeping the same short URL
-!["TinayApp Edit Long URL"](https://github.com/bbjarvis/tinyapp/blob/master/docs/TinyApp%20Edit%20Long%20URL.png)
+!["TinayApp Edit Long URL"](/docs/TinyAppEditLongURL.png)
 
 ## Dependencies
 
